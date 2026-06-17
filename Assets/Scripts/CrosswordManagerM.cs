@@ -4,11 +4,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
 public class CrosswordManagerM : MonoBehaviour
 {
-    
-    
-      public static CrosswordManagerM instance;
+
+    public static CrosswordManagerM instance;
 
     public TMP_InputField hiddenInput;
 
@@ -43,6 +43,10 @@ public class CrosswordManagerM : MonoBehaviour
     public GameObject cellPrefab;
 
     public Transform gridParent;
+    
+    private bool hintShown = false;
+    private List<(CellData cell, string letter)> hintCells =
+        new List<(CellData, string)>();
 
     private void Awake()
     {
@@ -136,7 +140,9 @@ public class CrosswordManagerM : MonoBehaviour
 
         if (gridCells.ContainsKey(nextPos))
         {
-            currentCell.NormalColor();
+            //currentCell.NormalColor(); 
+            currentCell.StopBlink();
+
 
             currentCell = gridCells[nextPos];
 
@@ -149,7 +155,7 @@ public class CrosswordManagerM : MonoBehaviour
     public void StartMediumlevel()
     {
         count = 0;
-        
+
         hiddenInput.onValueChanged.RemoveAllListeners();
         hiddenInput.onValueChanged.AddListener(TypeLetter);
 
@@ -238,88 +244,121 @@ public class CrosswordManagerM : MonoBehaviour
             }
         }
     }
+
     public void CheckAnswers()
     {
         bool allCorrect = true;
+    bool hasAnyLetter = false;
+    bool hasAnyCorrectWord = false;
 
-        foreach (var word in words)
+    count = 0;
+
+    foreach (var word in words)
+    {
+        string playerAnswer = "";
+
+        List<CellData> letterFields = new List<CellData>();
+
+        for (int i = 0; i < word.word.Length; i++)
         {
-            string playerAnswer = "";
+            Vector2Int position =
+                word.isHorizontal
+                    ? new Vector2Int(
+                        word.startPosition.x + i,
+                        word.startPosition.y)
+                    : new Vector2Int(
+                        word.startPosition.x,
+                        word.startPosition.y + i);
 
-            List<CellData> letterFields =
-                new List<CellData>();
-
-            for (int i = 0; i < word.word.Length; i++)
+            if (gridCells.ContainsKey(position))
             {
-                Vector2Int position =
-                    word.isHorizontal
-                        ? new Vector2Int(
-                            word.startPosition.x + i,
-                            word.startPosition.y)
-                        : new Vector2Int(
-                            word.startPosition.x,
-                            word.startPosition.y + i);
+                CellData inputField = gridCells[position];
 
-                if (gridCells.ContainsKey(position))
+                playerAnswer += inputField.letterText.text.ToUpper();
+
+                // Check if at least one letter is entered
+                if (!string.IsNullOrEmpty(inputField.letterText.text))
                 {
-                    CellData inputField =
-                        gridCells[position];
-
-                    playerAnswer +=
-                        inputField.letterText.text.ToUpper();
-
-                    letterFields.Add(inputField);
+                    hasAnyLetter = true;
                 }
-            }
 
-            if (playerAnswer == "")
+                letterFields.Add(inputField);
+            }
+        }
+
+        if (playerAnswer == "")
+        {
+            allCorrect = false;
+        }
+        else
+        {
+            if (playerAnswer == word.word.ToUpper())
             {
-                allCorrect = false;
+                hasAnyCorrectWord = true;
+                count++;
+
+                foreach (CellData inputField in letterFields)
+                {
+                    inputField.CorrectColor();
+                }
             }
             else
             {
-                if (playerAnswer ==
-                    word.word.ToUpper())
-                {
-                    count++;
-
-                    foreach (CellData inputField in letterFields)
-                    {
-                        inputField.CorrectColor();
-                    }
-                }
-                else
-                {
-                    allCorrect = false;
-                }
+                allCorrect = false;
             }
-        }
-
-        if (count >= words.Count && allCorrect)
-        {
-            GameManager.instance.EnableEasyWinpanel();
-
-            GameManager.instance.timerRunning = false;
-
-            GameManager.instance.playagainbtn.SetActive(true);
-        }
-        else if (!allCorrect)
-        {
-            GameManager.instance.EnableTryagain();
         }
     }
+
+    // Puzzle empty
+    if (!hasAnyLetter)
+    {
+        GameManager.instance.tryAgainText.text = "Puzzle Incomplete";
+        GameManager.instance.EnableTryagain();
+        return;
+    }
+
+    // No correct words
+    if (!hasAnyCorrectWord)
+    {
+        GameManager.instance.tryAgainText.text = "Answers Are Wrong";
+        GameManager.instance.EnableTryagain();
+        return;
+    }
+
+    // Some correct, some wrong
+    if (!allCorrect)
+    {
+        GameManager.instance.tryAgainText.text =
+            "Some Answers Are Incorrect. Try Again!";
+        GameManager.instance.EnableTryagain();
+        return;
+    }
+
+    // All correct
+    if (count >= words.Count && allCorrect)
+    {
+        GameManager.instance.EnableEasyWinpanel();
+        GameManager.instance.timerRunning = false;
+        GameManager.instance.playagainbtn.SetActive(true);
+    }
+       
+    }
+
+
+
     public void ShowHint()
     {
-        foreach (var word in words)
+        // First click -> Show Hint
+        if (!hintShown)
         {
-            if (word.hintIndex < 0 ||
-                word.hintIndex >= word.word.Length)
-            {
-                continue;
-            }
+            hintCells.Clear();
 
-            Vector2Int position =
-                word.isHorizontal
+            foreach (var word in words)
+            {
+                if (word.hintIndex < 0 || word.hintIndex >= word.word.Length)
+                    continue;
+
+                Vector2Int position = word.isHorizontal
                     ? new Vector2Int(
                         word.startPosition.x + word.hintIndex,
                         word.startPosition.y)
@@ -327,26 +366,39 @@ public class CrosswordManagerM : MonoBehaviour
                         word.startPosition.x,
                         word.startPosition.y + word.hintIndex);
 
-            if (gridCells.ContainsKey(position))
-            {
-                CellData inputField =
-                    gridCells[position];
+                if (gridCells.ContainsKey(position))
+                {
+                    CellData cell = gridCells[position];
 
-                char correctLetter =
-                    word.word[word.hintIndex];
+                    string correctLetter =
+                        word.word[word.hintIndex].ToString();
 
-                if (inputField.letterText.text.ToUpper()
-                    == correctLetter.ToString().ToUpper())
-                    continue;
+                    cell.SetLetter(correctLetter);
 
-                inputField.SetLetter(
-                    correctLetter.ToString());
+                    hintCells.Add((cell, correctLetter));
+                }
             }
+
+            hintShown = true;
+        }
+        // Second click -> Clear Hint
+        else
+        {
+            foreach (var hintData in hintCells)
+            {
+                // Clear only hint letters
+                if (hintData.cell.letterText.text ==
+                    hintData.letter)
+                {
+                    hintData.cell.SetLetter("");
+                }
+            }
+
+            hintCells.Clear();
+            hintShown = false;
         }
     }
-
- 
-
+    
     private void HighlightWord(CrosswordWord wordToHighlight)
     {
         foreach (var kvp in gridCells)
@@ -374,9 +426,16 @@ public class CrosswordManagerM : MonoBehaviour
             }
         }
     }
-
     public void SelectCell(CellData cell)
     {
+        
+        // Stop blinking on previously selected cell
+        if (currentCell != null)
+        {
+            currentCell.StopBlink();
+            currentCell.NormalColor();
+        }
+
         currentCell = cell;
 
         List<CrosswordWord> relatedWords =
@@ -420,5 +479,38 @@ public class CrosswordManagerM : MonoBehaviour
 #if UNITY_ANDROID
         TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
 #endif
+    }
+    
+    public void ClearAllWords()
+    {
+        hintShown = false;
+        foreach (var kvp in gridCells)
+        {
+            CellData cell = kvp.Value;
+
+            if (cell.GetComponent<Button>().interactable)
+            {
+                // Clear letter
+                cell.SetLetter("");
+
+                // Stop blink animation
+                cell.StopBlink();
+
+                // Reset color
+                cell.NormalColor();
+            }
+        }
+
+        // Clear current selection
+        currentCell = null;
+        currentActiveWord = null;
+
+        hiddenInput.text = "";
+    }
+    public void Clearallcells()
+    {
+        hintShown = false;
+        hintCells.Clear();
+       
     }
 }

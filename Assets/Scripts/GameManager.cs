@@ -15,9 +15,9 @@ public class GameManager : MonoBehaviour
    public gamelevel _Gamelevel;
 
 
-   public GameObject playagainbtn, pausepanel, tryagain, levelselection, startpage, levelcomplete, finalpanel;
+   public GameObject playagainbtn, pausepanel, tryagain, levelselection, startpage, levelcomplete, finalpanel,quitpanel;
 
-   public GameObject easypanel, mediumpanel, hardpanel;//level1animation,level2animation,level3animation;
+   public GameObject easypanel, mediumpanel, hardpanel;
    public Button hintbutton1,hintbutton2,hintbutton3;
    
    public CrosswordManager crosswordManager;
@@ -28,12 +28,9 @@ public class GameManager : MonoBehaviour
 
    public Image s1, s2, s3;
    public Sprite emptystar,filledstar;
-   //public GameObject worm1, worm2, worm3,spiderdead;
-   //[Header("Animations")]
-  // public GameObject pauseThink, levelcompletedance, tryagiansad, finaldance;
+   
    private void Start()
    {
-
       Tween myTween;
       instance = this;
    }
@@ -42,6 +39,7 @@ public class GameManager : MonoBehaviour
    public TextMeshProUGUI timerText,timerTextM,timerTextH; 
     float timeRemaining;
    public bool timerRunning = false;
+   public TextMeshProUGUI tryAgainText;
    
    void Update()
    {
@@ -59,28 +57,17 @@ public class GameManager : MonoBehaviour
 
          if (_Gamelevel == gamelevel.easy)
          {
-           // worm3.SetActive(false);
-            ///easylevelbreathing.SetActive(false);
-            //wormdead.SetActive(true);
-            
-            Invoke("EnableTimeupPanel",5.2f);
+            EnableTimeupPanel();
          }
          else if (_Gamelevel == gamelevel.medium)
          {
-            
-            //Vector3 pos = smokepos.position;
-           // GameObject obj = Instantiate(smoke,pos,quaternion.identity);
-          //  Invoke("DisableBreathAnimation",0.3f);
-          //  Invoke("enabledeadcharmedium",0.3f);
-            Invoke("EnableTimeupPanel",3.5f);
+            EnableTimeupPanel();
          }
          else if (_Gamelevel == gamelevel.hard)
          {
-            StartCoroutine("enableBug");
+            EnableTimeupPanel();
          }
          
-         
-
       }
    }
 
@@ -90,18 +77,7 @@ public class GameManager : MonoBehaviour
       timeuppanel.SetActive(true);
       
    }
-
-   IEnumerator enableBug()
-   {
-     
-   //  hardlevelbreathing.SetActive(false);
-   //  bugloop.SetActive(false);
-   //  bugdead.SetActive(true);
-     yield return new WaitForSeconds(4.8f);
-      EnableTimeupPanel();
-   }
-
-  
+    
 
    void UpdateTimerText()
    {
@@ -115,11 +91,8 @@ public class GameManager : MonoBehaviour
    public void RetryGame()
    {
       timeuppanel.SetActive(false);
-      //tryagiansad.SetActive(false);
       
       levelcomplete.SetActive(false);
-      //levelcompletedance.SetActive(false);
-
       Resetwormanimation();
       
       TimerLoad();
@@ -138,46 +111,14 @@ public class GameManager : MonoBehaviour
          crosswordManagerH.ClearGrid();
          crosswordManagerH.StartHardlevel();
       }
-      
       tryagain.SetActive(false);
-      
-     // pauseThink.SetActive(false);
-     // tryagiansad.SetActive(false);
-     // finaldance.SetActive(false);
-    //  levelcompletedance.SetActive(false);
-      
       hintbutton1.interactable = true;
       hintbutton2.interactable = true;
       hintbutton3.interactable = true;
-
    }
-
    void Resetwormanimation()
    {
-     // easylevelbreathing.SetActive(true);
-    //  wormdead.SetActive(false);
-      
-//      mediumlevelbreathing.SetActive(true);
-     // spiderroundanimation.SetActive(true);
-      //spiderdead.SetActive(false);
-      
-    //  hardlevelbreathing.SetActive(true);
-    //  bugloop.SetActive(true);
-     // bugdead.SetActive(false);
-      
       CancelInvoke();
-     // DOTween.Kill(worm1.transform);
-     // DOTween.Kill(worm2.transform);
-     // DOTween.Kill(worm3.transform);
-     // DOTween.KillAll();
-      
-     // worm1.transform.localPosition = new Vector3(10, -8,9);
-     // worm2.transform.localPosition = new Vector3(1, -8, 9);
-     // worm3.transform.localPosition = new Vector3(-7, -8,9);
-      
-     // worm1.SetActive(true);
-     // worm2.SetActive(false);
-     // worm3.SetActive(false);
    }
 
    public void PlayAgain()
@@ -189,10 +130,9 @@ public class GameManager : MonoBehaviour
    {
       levelcomplete.SetActive(true);
       timerRunning = false;
-      //levelcompletedance.SetActive(true);
       
       Debug.Log(timeRemaining);
-      // star given condition 
+      
       if (_Gamelevel == gamelevel.easy && timeRemaining <= 120)
       {
          Debug.Log(timeRemaining);
@@ -208,9 +148,6 @@ public class GameManager : MonoBehaviour
          Debug.Log(timeRemaining);
          Threestar();
       }
-      
-      
-      
       
       
       //medium
@@ -302,7 +239,7 @@ public class GameManager : MonoBehaviour
       Time.timeScale = 0;
       timerRunning = false;
       pausepanel.SetActive(true);
-      //pauseThink.SetActive(true);
+     
    }
 
    public void Resumegame()
@@ -310,40 +247,31 @@ public class GameManager : MonoBehaviour
       Time.timeScale = 1;
       timerRunning = true;
       pausepanel.SetActive(false);
-      //pauseThink.SetActive(false);
+      
    }
 
    public void EnableTryagain()
    {
       tryagain.SetActive(true);
-      //tryagiansad.SetActive(true);
+      
    }
 
    public void Levelshow()
    {
       timerRunning = false;
       levelselection.SetActive(true);
-      
       startpage.SetActive(false);
-      //startpageanimation.SetActive(false);
-      
       levelcomplete.SetActive(false);
-      //levelcompletedance.SetActive(false);
-      
       easypanel.SetActive(false);
       mediumpanel.SetActive(false);
       hardpanel.SetActive(false);
       
-      // level1animation.SetActive(false);
-      // level2animation.SetActive(false);
-      // level3animation.SetActive(false);
    }
 
    public void Homepage()
    {
       SceneManager.LoadScene(0);
    }
-   
    
 
    ///game level
@@ -359,35 +287,10 @@ public class GameManager : MonoBehaviour
       mediumpanel.SetActive(false);
       hardpanel.SetActive(false);
       
-      // level1animation.SetActive(true);
-      // level2animation.SetActive(false);
-      // level3animation.SetActive(false);
-      
       timeRemaining = 300;
-      //timeRemaining = 10;
       
-     
-      // worm1.transform.DOLocalMoveX(1, 100).SetEase(Ease.InOutSine);
-       Invoke("wormtwo",100);
-      
-   }
-
-   void wormtwo()
-   {
-     // worm1.SetActive(false);
-     // worm2.SetActive(true);
-     // worm2.transform.DOLocalMoveX(-7, 100).SetEase(Ease.InOutSine);
-      Invoke("wormthree",100);
    }
    
-   void wormthree()
-   {
-     // worm1.SetActive(false);
-    //  worm2.SetActive(false);
-    //  worm3.SetActive(true);
-    //  worm3.transform.DOLocalMoveX(-10, 100).SetEase(Ease.InOutSine);
-   }
-
    public void MediumLevel()
    {
      
@@ -400,14 +303,7 @@ public class GameManager : MonoBehaviour
       mediumpanel.SetActive(true);
       hardpanel.SetActive(false);
       
-     // level1animation.SetActive(false);
-     // level2animation.SetActive(true);
-    //  level3animation.SetActive(false);
-      
       timeRemaining = 480;
-     //timeRemaining = 10;
-      //Debug.Log("medium");
-      
    }
 
    public void HardLevel()
@@ -422,14 +318,7 @@ public class GameManager : MonoBehaviour
       mediumpanel.SetActive(false);
       hardpanel.SetActive(true);
       
-      //level1animation.SetActive(false);
-      //level2animation.SetActive(false);
-      //level3animation.SetActive(true);
-
       timeRemaining = 600;
-     // timeRemaining = 10;
-      
-     // Debug.Log("hard");
       
    }
 
@@ -439,32 +328,58 @@ public class GameManager : MonoBehaviour
       {
          crosswordManagerM.StartMediumlevel();
          levelcomplete.SetActive(false);
-         //levelcompletedance.SetActive(false);
+         
       }
       else if (_Gamelevel == gamelevel.medium)
       {
          crosswordManagerH.StartHardlevel();
          levelcomplete.SetActive(false);
-         //levelcompletedance.SetActive(false);
+         
       }
       else if(_Gamelevel == gamelevel.hard)
       {
          finalpanel.SetActive(true);
          timerRunning = false;
-         //finaldance.SetActive(true);
-         //levelcompletedance.SetActive(false);
       }
-      
    }
-
    public void OnClick_Exit()
    {
-      //Application.OpenURL("https://beta.skillhub.sq1.security/course/view.php?id=33");
-     // Application.OpenURL("http://192.168.8.59/course/view.php?id=33");
-     
-     Application.Quit();
+      Time.timeScale = 0;
+     quitpanel.SetActive(true);
    }
-   
+
+   public void OnClick_ExitConfirm()
+   {
+      Time.timeScale = 1;
+      Application.Quit();
+   }
+
+   public void OnCLick_NoExit()
+   {
+      Time.timeScale = 1;
+      quitpanel.SetActive(false);
+   }
+   public void OnClick_ClearWord()
+   {
+      if (_Gamelevel == gamelevel.easy)
+      {
+         crosswordManager.ClearAllWords();
+       
+      }
+         
+      else if (_Gamelevel == gamelevel.medium)
+      {
+         crosswordManagerM.ClearAllWords();
+         
+      }
+         
+      else if (_Gamelevel == gamelevel.hard)
+      {
+         crosswordManagerH.ClearAllWords();
+         
+      }
+        
+   }
 }
    public enum gamelevel
    {

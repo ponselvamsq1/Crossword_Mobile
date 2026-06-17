@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -13,6 +14,9 @@ public class CellData : MonoBehaviour
     public Image bgImage;
 
     public Vector2Int gridPosition;
+       
+    private Tween blinkTween;
+    
 
     public void Setup(Vector2Int pos)
     {
@@ -28,11 +32,11 @@ public class CellData : MonoBehaviour
 
     public void SetLetter(string letter)
     {
-        Debug.Log("SET LETTER : " + letter);
+       // Debug.Log("SET LETTER : " + letter);
 
         letterText.text = letter;
 
-        //letterText.color = Color.red;
+      
     }
 
     public void SetNumber(string number)
@@ -61,7 +65,16 @@ public class CellData : MonoBehaviour
 
     public void SelectCellColor()
     {
-        bgImage.color = Color.yellow;
+       // bgImage.color = Color.yellow;
+      
+       StopBlink();
+
+       bgImage.color = new Color(1f, 0.8f, 0f);
+
+       blinkTween = transform
+           .DOScale(1.15f, 0.4f)
+           .SetLoops(-1, LoopType.Yoyo);
+       
     }
 
     public void NormalColor()
@@ -90,5 +103,21 @@ public class CellData : MonoBehaviour
         {
             CrosswordManagerH.instance.SelectCell(this);
         }
+    }
+    
+    
+   
+    public void StopBlink()
+    {
+        if (blinkTween != null)
+        {
+            blinkTween.Kill();
+            blinkTween = null;
+        }
+
+        transform.localScale = Vector3.one;
+
+        // Return to highlighted-word color
+        bgImage.color = new Color(1f, 0.92f, 0.6f);
     }
 }
