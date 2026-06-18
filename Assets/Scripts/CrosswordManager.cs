@@ -42,9 +42,7 @@ public class CrosswordManager : MonoBehaviour
     private void Start()
     {
         hiddenInput.characterLimit = 1;
-
         hiddenInput.shouldHideMobileInput = true;
-
         hiddenInput.onValueChanged.RemoveAllListeners();
         hiddenInput.onValueChanged.AddListener(TypeLetter);
     }
@@ -54,26 +52,16 @@ public class CrosswordManager : MonoBehaviour
     }
     void TypeLetter(string value)
     {
-       // Debug.Log("Typing : " + value);
-
         if (string.IsNullOrEmpty(value))
             return;
-
         if (currentCell == null)
             return;
-
         string letter = value.Substring(value.Length - 1).ToUpper();
-
         currentCell.SetLetter(letter);
-
         hiddenInput.onValueChanged.RemoveListener(TypeLetter);
-
         hiddenInput.text = "";
-
         hiddenInput.onValueChanged.AddListener(TypeLetter);
-
         MoveNextCell();
-
         StartCoroutine(ReopenKeyboard());
     }
     IEnumerator ReopenKeyboard()
@@ -106,9 +94,7 @@ public class CrosswordManager : MonoBehaviour
                 break;
             }
         }
-
         int nextIndex = currentIndex + 1;
-
         if (nextIndex >= currentActiveWord.word.Length)
             return;
 
@@ -120,13 +106,9 @@ public class CrosswordManager : MonoBehaviour
 
         if (gridCells.ContainsKey(nextPos))
         {
-          // currentCell.NormalColor();
            currentCell.StopBlink();
-
             currentCell = gridCells[nextPos];
-
             currentCell.SelectCellColor();
-
             hiddenInput.ActivateInputField();
         }
     }
@@ -138,6 +120,7 @@ public class CrosswordManager : MonoBehaviour
         GameManager.instance.EasyLevel();
         GameManager.instance.timerRunning = true;
         GenerateGrid();
+        LoadCompletedPuzzle();
     }
     public void ClearGrid()
     {
@@ -210,9 +193,18 @@ public class CrosswordManager : MonoBehaviour
    {
        foreach (var kvp in gridCells)
        {
-           if (kvp.Value.GetComponent<Button>().interactable)
+           CellData cell = kvp.Value;
+
+           if (!cell.GetComponent<Button>().interactable)
+               continue;
+
+           if (cell.isCorrect)
            {
-               kvp.Value.bgImage.color = Color.white;
+               cell.bgImage.color = Color.green; // your correct color
+           }
+           else
+           {
+               cell.bgImage.color = Color.white;
            }
        }
        for (int i = 0; i < wordToHighlight.word.Length; i++)
@@ -313,12 +305,14 @@ public class CrosswordManager : MonoBehaviour
     
     if (count >= words.Count && allCorrect)
     {
+        
+        SaveCompletedPuzzle();
+        
         GameManager.instance.EnableEasyWinpanel();
         GameManager.instance.timerRunning = false;
         GameManager.instance.playagainbtn.SetActive(true);
     }
     }
-
     public void ShowHint()
     {
         // First click -> Show Hint
@@ -372,7 +366,6 @@ public class CrosswordManager : MonoBehaviour
     
     public void SelectCell(CellData cell)
     {
-        // Stop blinking on previously selected cell
         if (currentCell != null)
         {
             currentCell.StopBlink();
@@ -399,13 +392,9 @@ public class CrosswordManager : MonoBehaviour
 
             inputClickState[currentCell] = 1 - toggleIndex;
         }
-
         HighlightWord(currentActiveWord);
-
         currentCell.SelectCellColor();
-
         hiddenInput.text = "";
-
         StartCoroutine(OpenKeyboard());
 
     }
@@ -420,15 +409,14 @@ public class CrosswordManager : MonoBehaviour
 
         hiddenInput.ActivateInputField();
 
-#if UNITY_ANDROID
-        TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
-#endif
+// #if UNITY_ANDROID
+//         TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
+// #endif
     }
     
     public void ClearAllWords()
     {
-      
-
+        DeleteSavedPuzzle();
         foreach (var kvp in gridCells)
         {
             CellData cell = kvp.Value;
@@ -446,15 +434,77 @@ public class CrosswordManager : MonoBehaviour
 
         hiddenInput.text = "";
     }
-
-    public void Clearallcells()
+    
+    public void SaveCompletedPuzzle()
     {
-        hintShown = false;
-        hintCells.Clear();
-       
+        foreach (var kvp in gridCells)
+        {
+            Vector2Int pos = kvp.Key;
+            CellData cell = kvp.Value;
+
+            if (cell.GetComponent<Button>().interactable)
+            {
+                PlayerPrefs.SetString(
+                    gameObject.name + "_" + pos.x + "_" + pos.y,
+                    cell.letterText.text);
+            }
+        }
+
+        PlayerPrefs.Save();
+    }
+    public void LoadCompletedPuzzle()
+    {
+        foreach (var kvp in gridCells)
+        {
+            Vector2Int pos = kvp.Key;
+            CellData cell = kvp.Value;
+
+            string key =
+                gameObject.name + "_" + pos.x + "_" + pos.y;
+
+            if (PlayerPrefs.HasKey(key))
+            {
+                string letter = PlayerPrefs.GetString(key);
+
+                cell.SetLetter(letter);
+
+                if (!string.IsNullOrEmpty(letter))
+                {
+                    cell.CorrectColor();
+                }
+            }
+        }
+    }
+    public void DeleteSavedPuzzle()
+    {
+        foreach (var kvp in gridCells)
+        {
+            Vector2Int pos = kvp.Key;
+
+            string key =
+                gameObject.name + "_" + pos.x + "_" + pos.y;
+
+            PlayerPrefs.DeleteKey(key);
+        }
+
+        PlayerPrefs.Save();
     }
     
-    
-  
+    public void EnterLetter(string letter)
+    {
+        if (currentCell == null)
+            return;
+
+        currentCell.SetLetter(letter.ToUpper());
+
+        MoveNextCell();
+    }
+    public void DeleteLetter()
+    {
+        if (currentCell == null)
+            return;
+
+        currentCell.SetLetter("");
+    }
 
 }

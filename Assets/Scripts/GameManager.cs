@@ -83,9 +83,9 @@ public class GameManager : MonoBehaviour
    {
       int minutes = Mathf.FloorToInt(timeRemaining / 60);
       int seconds = Mathf.FloorToInt(timeRemaining % 60);
-      timerText.text ="Time left "  + string.Format("{0:00}:{1:00}", minutes, seconds) ;
-      timerTextM.text ="Time left "  + string.Format("{0:00}:{1:00}", minutes, seconds) ;
-      timerTextH.text ="Time left "  + string.Format("{0:00}:{1:00}", minutes, seconds) ;
+      timerText.text = "Time Left:" +string.Format("{0:00}:{1:00}", minutes, seconds) ;
+      timerTextM.text = "Time Left:" +string.Format("{0:00}:{1:00}", minutes, seconds) ;
+      timerTextH.text = "Time Left:" +string.Format("{0:00}:{1:00}", minutes, seconds) ;
    }
 
    public void RetryGame()
@@ -353,7 +353,6 @@ public class GameManager : MonoBehaviour
       Time.timeScale = 1;
       Application.Quit();
    }
-
    public void OnCLick_NoExit()
    {
       Time.timeScale = 1;
@@ -364,21 +363,15 @@ public class GameManager : MonoBehaviour
       if (_Gamelevel == gamelevel.easy)
       {
          crosswordManager.ClearAllWords();
-       
       }
-         
       else if (_Gamelevel == gamelevel.medium)
       {
          crosswordManagerM.ClearAllWords();
-         
       }
-         
       else if (_Gamelevel == gamelevel.hard)
       {
          crosswordManagerH.ClearAllWords();
-         
       }
-        
    }
 }
    public enum gamelevel
