@@ -13,19 +13,13 @@ public class GameManager : MonoBehaviour
 {
    public static GameManager instance;
    public gamelevel _Gamelevel;
-
-
    public GameObject playagainbtn, pausepanel, tryagain, levelselection, startpage, levelcomplete, finalpanel,quitpanel;
-
    public GameObject easypanel, mediumpanel, hardpanel;
    public Button hintbutton1,hintbutton2,hintbutton3;
-   
    public CrosswordManager crosswordManager;
    public CrosswordManagerM crosswordManagerM;
    public CrosswordManagerH crosswordManagerH;
-
    public TextMeshProUGUI level1txtx, level2txtx, level3txtxt;
-
    public Image s1, s2, s3;
    public Sprite emptystar,filledstar;
    
@@ -34,13 +28,11 @@ public class GameManager : MonoBehaviour
       Tween myTween;
       instance = this;
    }
-   
    public GameObject timeuppanel;
    public TextMeshProUGUI timerText,timerTextM,timerTextH; 
     float timeRemaining;
    public bool timerRunning = false;
    public TextMeshProUGUI tryAgainText;
-   
    void Update()
    {
       if (timerRunning && timeRemaining > 0)
@@ -70,15 +62,13 @@ public class GameManager : MonoBehaviour
          
       }
    }
-
-  
+   
     void EnableTimeupPanel()
    {
       timeuppanel.SetActive(true);
       
    }
     
-
    void UpdateTimerText()
    {
       int minutes = Mathf.FloorToInt(timeRemaining / 60);
@@ -120,7 +110,6 @@ public class GameManager : MonoBehaviour
    {
       CancelInvoke();
    }
-
    public void PlayAgain()
    {
       SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex );
@@ -131,21 +120,17 @@ public class GameManager : MonoBehaviour
       levelcomplete.SetActive(true);
       timerRunning = false;
       
-      Debug.Log(timeRemaining);
-      
       if (_Gamelevel == gamelevel.easy && timeRemaining <= 120)
       {
-         Debug.Log(timeRemaining);
+         
          Onestar();
       }
       else if (_Gamelevel == gamelevel.easy && timeRemaining > 120 &&  timeRemaining < 180)
       {
-         Debug.Log(timeRemaining);
          Twostar();
       }
       else if (_Gamelevel == gamelevel.easy && timeRemaining >= 180)
       {
-         Debug.Log(timeRemaining);
          Threestar();
       }
       
@@ -153,34 +138,27 @@ public class GameManager : MonoBehaviour
       //medium
       if (_Gamelevel == gamelevel.medium && timeRemaining <= 240)
       {
-         Debug.Log(timeRemaining);
          Onestar();
       }
       else if (_Gamelevel == gamelevel.medium && timeRemaining > 240 &&  timeRemaining < 360)
       {
-         Debug.Log(timeRemaining);
          Twostar();
       }
       else if (_Gamelevel == gamelevel.medium && timeRemaining >= 360)
       {
-         Debug.Log(timeRemaining);
          Threestar();
       }
-      
       // hard
       if (_Gamelevel == gamelevel.hard && timeRemaining <= 240)
       {
-         Debug.Log(timeRemaining);
          Onestar();
       }
       else if (_Gamelevel == gamelevel.hard && timeRemaining > 240 &&  timeRemaining < 360)
       {
-         Debug.Log(timeRemaining);
          Twostar();
       }
       else if (_Gamelevel == gamelevel.hard && timeRemaining >= 360)
       {
-         Debug.Log(timeRemaining);
          Threestar();
       }
       TimerLoad();
@@ -290,7 +268,6 @@ public class GameManager : MonoBehaviour
       timeRemaining = 300;
       
    }
-   
    public void MediumLevel()
    {
      
@@ -305,19 +282,14 @@ public class GameManager : MonoBehaviour
       
       timeRemaining = 480;
    }
-
    public void HardLevel()
    {
       hintbutton3.interactable = true;
-      
       level3txtxt.text = "Level 3";
-      
       _Gamelevel = gamelevel.hard;
-      
       easypanel.SetActive(false);
       mediumpanel.SetActive(false);
       hardpanel.SetActive(true);
-      
       timeRemaining = 600;
       
    }

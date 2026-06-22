@@ -68,10 +68,6 @@ public class CrosswordManager : MonoBehaviour
     {
         yield return null;
 
-        EventSystem.current.SetSelectedGameObject(hiddenInput.gameObject);
-
-        hiddenInput.Select();
-        hiddenInput.ActivateInputField();
     }
     void MoveNextCell()
     {
@@ -109,7 +105,7 @@ public class CrosswordManager : MonoBehaviour
            currentCell.StopBlink();
             currentCell = gridCells[nextPos];
             currentCell.SelectCellColor();
-            hiddenInput.ActivateInputField();
+          
         }
     }
     public void StartEasylevel()
@@ -395,24 +391,11 @@ public class CrosswordManager : MonoBehaviour
         HighlightWord(currentActiveWord);
         currentCell.SelectCellColor();
         hiddenInput.text = "";
-        StartCoroutine(OpenKeyboard());
+      
 
     }
     
-    IEnumerator OpenKeyboard()
-    {
-        yield return null;
-
-        EventSystem.current.SetSelectedGameObject(hiddenInput.gameObject);
-
-        hiddenInput.Select();
-
-        hiddenInput.ActivateInputField();
-
-// #if UNITY_ANDROID
-//         TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
-// #endif
-    }
+    
     
     public void ClearAllWords()
     {

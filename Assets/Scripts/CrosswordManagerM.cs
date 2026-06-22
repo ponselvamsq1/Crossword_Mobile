@@ -55,8 +55,6 @@ public class CrosswordManagerM : MonoBehaviour
 
     void TypeLetter(string value)
     {
-        Debug.Log("Typing : " + value);
-
         if (string.IsNullOrEmpty(value))
             return;
 
@@ -64,22 +62,15 @@ public class CrosswordManagerM : MonoBehaviour
             return;
         string letter = value.Substring(value.Length - 1).ToUpper();
         currentCell.SetLetter(letter);
-        Debug.Log(currentCell.name);
-        Debug.Log(currentCell.letterText.text);
+      
         hiddenInput.onValueChanged.RemoveListener(TypeLetter);
         hiddenInput.text = "";
         hiddenInput.onValueChanged.AddListener(TypeLetter);
         MoveNextCell();
-        StartCoroutine(ReopenKeyboard());
+        //StartCoroutine(ReopenKeyboard());
     }
 
-    IEnumerator ReopenKeyboard()
-    {
-        yield return null;
-        EventSystem.current.SetSelectedGameObject(hiddenInput.gameObject);
-        hiddenInput.Select();
-        hiddenInput.ActivateInputField();
-    }
+  
     void MoveNextCell()
     {
         if (currentActiveWord == null || currentCell == null)
@@ -121,7 +112,6 @@ public class CrosswordManagerM : MonoBehaviour
             currentCell.StopBlink();
             currentCell = gridCells[nextPos];
             currentCell.SelectCellColor();
-            hiddenInput.ActivateInputField();
         }
     }
 
@@ -189,8 +179,6 @@ public class CrosswordManagerM : MonoBehaviour
 
                     cell.EnableCell();
 
-                    //cell.currentWord = null;
-
                     if (!inputFieldToWords.ContainsKey(cell))
                         inputFieldToWords[cell] =
                             new List<CrosswordWord>();
@@ -237,8 +225,7 @@ public class CrosswordManagerM : MonoBehaviour
                 CellData inputField = gridCells[position];
 
                 playerAnswer += inputField.letterText.text.ToUpper();
-
-                // Check if at least one letter is entered
+                
                 if (!string.IsNullOrEmpty(inputField.letterText.text))
                 {
                     hasAnyLetter = true;
@@ -424,22 +411,14 @@ public class CrosswordManagerM : MonoBehaviour
         HighlightWord(currentActiveWord);
         currentCell.SelectCellColor();
         hiddenInput.text = "";
-        StartCoroutine(OpenKeyboard());
+        //StartCoroutine(OpenKeyboard());
     }
 
     IEnumerator OpenKeyboard()
     {
         yield return null;
 
-        EventSystem.current.SetSelectedGameObject(hiddenInput.gameObject);
-
-        hiddenInput.Select();
-
-        hiddenInput.ActivateInputField();
-
-#if UNITY_ANDROID
-        TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
-#endif
+     
     }
     public void ClearAllWords()
     {

@@ -54,7 +54,7 @@ public class CrosswordManagerH : MonoBehaviour
 
     void TypeLetter(string value)
     {
-        Debug.Log("Typing : " + value);
+      
 
         if (string.IsNullOrEmpty(value))
             return;
@@ -68,17 +68,8 @@ public class CrosswordManagerH : MonoBehaviour
         hiddenInput.text = "";
         hiddenInput.onValueChanged.AddListener(TypeLetter);
         MoveNextCell();
-        StartCoroutine(ReopenKeyboard());
     }
-
-    IEnumerator ReopenKeyboard()
-    {
-        yield return null;
-        EventSystem.current.SetSelectedGameObject(hiddenInput.gameObject);
-        hiddenInput.Select();
-        hiddenInput.ActivateInputField();
-    }
-
+    
     void MoveNextCell()
     {
         if (currentActiveWord == null || currentCell == null)
@@ -102,7 +93,6 @@ public class CrosswordManagerH : MonoBehaviour
                 break;
             }
         }
-
         int nextIndex = currentIndex + 1;
 
         if (nextIndex >= currentActiveWord.word.Length)
@@ -121,7 +111,6 @@ public class CrosswordManagerH : MonoBehaviour
             currentCell.StopBlink();
             currentCell = gridCells[nextPos];
             currentCell.SelectCellColor();
-            hiddenInput.ActivateInputField();
         }
     }
 
@@ -276,25 +265,7 @@ public class CrosswordManagerH : MonoBehaviour
         HighlightWord(currentActiveWord);
         currentCell.SelectCellColor();
         hiddenInput.text = "";
-        StartCoroutine(OpenKeyboard());
-    }
-
-    IEnumerator OpenKeyboard()
-    {
-        yield return null;
-
-        EventSystem.current.SetSelectedGameObject(
-            hiddenInput.gameObject);
-
-        hiddenInput.Select();
-
-        hiddenInput.ActivateInputField();
-
-#if UNITY_ANDROID
-        TouchScreenKeyboard.Open(
-            "",
-            TouchScreenKeyboardType.Default);
-#endif
+        //StartCoroutine(OpenKeyboard());
     }
 
     public void CheckAnswers()
