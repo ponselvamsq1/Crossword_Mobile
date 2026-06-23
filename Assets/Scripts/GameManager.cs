@@ -22,11 +22,29 @@ public class GameManager : MonoBehaviour
    public TextMeshProUGUI level1txtx, level2txtx, level3txtxt;
    public Image s1, s2, s3;
    public Sprite emptystar,filledstar;
+   private float saveTimer;
    
    private void Start()
    {
       Tween myTween;
       instance = this;
+
+      if (PlayerPrefs.HasKey("CurrentLevel"))
+      {
+         int savedLevel =
+            PlayerPrefs.GetInt("CurrentLevel");
+
+         _Gamelevel = (gamelevel)savedLevel;
+
+         if (_Gamelevel == gamelevel.easy)
+            crosswordManager.StartEasylevel();
+
+         else if (_Gamelevel == gamelevel.medium)
+            crosswordManagerM.StartMediumlevel();
+
+         else if (_Gamelevel == gamelevel.hard)
+            crosswordManagerH.StartHardlevel();
+      }
    }
    public GameObject timeuppanel;
    public TextMeshProUGUI timerText,timerTextM,timerTextH; 
@@ -39,6 +57,12 @@ public class GameManager : MonoBehaviour
       {
          timeRemaining -= Time.deltaTime;
          UpdateTimerText();
+         saveTimer += Time.deltaTime;
+         if (saveTimer >= 2f)
+         {
+            SaveGameData();
+            saveTimer = 0;
+         }
       }
       else if (timeRemaining <= 0 && timerRunning)
       {
@@ -63,11 +87,26 @@ public class GameManager : MonoBehaviour
       }
    }
    
+   
     void EnableTimeupPanel()
    {
       timeuppanel.SetActive(true);
       
    }
+    
+   public void SaveGameData()
+   {
+      PlayerPrefs.SetInt("CurrentLevel", (int)_Gamelevel);
+
+      if (_Gamelevel == gamelevel.easy) PlayerPrefs.SetFloat("EasyTime", timeRemaining);
+
+      else if (_Gamelevel == gamelevel.medium) PlayerPrefs.SetFloat("MediumTime", timeRemaining);
+
+      else if (_Gamelevel == gamelevel.hard) PlayerPrefs.SetFloat("HardTime", timeRemaining);
+
+      PlayerPrefs.Save();
+   }
+    
     
    void UpdateTimerText()
    {
@@ -265,22 +304,26 @@ public class GameManager : MonoBehaviour
       mediumpanel.SetActive(false);
       hardpanel.SetActive(false);
       
-      timeRemaining = 300;
+      timeRemaining = PlayerPrefs.GetFloat("EasyTime", 300);
+      
+    
       
    }
    public void MediumLevel()
    {
      
-      hintbutton2.interactable = true;
+       hintbutton2.interactable = true;
       
-      level2txtx.text = "Level 2";
-      _Gamelevel = gamelevel.medium;
+       level2txtx.text = "Level 2";
+       _Gamelevel = gamelevel.medium;
       
-      easypanel.SetActive(false);
-      mediumpanel.SetActive(true);
-      hardpanel.SetActive(false);
+       easypanel.SetActive(false);
+       mediumpanel.SetActive(true);
+       hardpanel.SetActive(false);
       
-      timeRemaining = 480;
+       timeRemaining = PlayerPrefs.GetFloat("MediumTime", 480);
+      
+     
    }
    public void HardLevel()
    {
@@ -290,8 +333,8 @@ public class GameManager : MonoBehaviour
       easypanel.SetActive(false);
       mediumpanel.SetActive(false);
       hardpanel.SetActive(true);
-      timeRemaining = 600;
-      
+      timeRemaining = PlayerPrefs.GetFloat("HardTime", 600);
+     
    }
 
    public void NextLevel()
@@ -344,6 +387,17 @@ public class GameManager : MonoBehaviour
       {
          crosswordManagerH.ClearAllWords();
       }
+   }
+   
+   private void OnApplicationPause(bool pause)
+   {
+      if (pause)
+         SaveGameData();
+   }
+
+   private void OnApplicationQuit()
+   {
+      SaveGameData();
    }
 }
    public enum gamelevel

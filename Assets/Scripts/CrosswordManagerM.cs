@@ -474,10 +474,10 @@ public class CrosswordManagerM : MonoBehaviour
 
                 cell.SetLetter(letter);
 
-                if (!string.IsNullOrEmpty(letter))
-                {
-                    cell.CorrectColor();
-                }
+                // if (!string.IsNullOrEmpty(letter))
+                // {
+                //     cell.CorrectColor();
+                // }
             }
         }
     }
@@ -502,6 +502,7 @@ public class CrosswordManagerM : MonoBehaviour
 
         currentCell.SetLetter(letter.ToUpper());
 
+        SaveProgress();
         MoveNextCell();
     }
     public void DeleteLetter()
@@ -510,5 +511,26 @@ public class CrosswordManagerM : MonoBehaviour
             return;
 
         currentCell.SetLetter("");
+        SaveProgress();
+    }
+    
+    
+    public void SaveProgress()
+    {
+        foreach (var kvp in gridCells)
+        {
+            Vector2Int pos = kvp.Key;
+            CellData cell = kvp.Value;
+
+            if (cell.GetComponent<Button>().interactable)
+            {
+                string key =
+                    gameObject.name + "_" + pos.x + "_" + pos.y;
+
+                PlayerPrefs.SetString(key, cell.letterText.text);
+            }
+        }
+
+        PlayerPrefs.Save();
     }
 }
