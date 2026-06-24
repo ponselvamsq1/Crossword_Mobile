@@ -120,27 +120,37 @@ public class GameManager : MonoBehaviour
    public void RetryGame()
    {
       timeuppanel.SetActive(false);
-      
       levelcomplete.SetActive(false);
-      Resetwormanimation();
-      
-      TimerLoad();
+
       if (_Gamelevel == gamelevel.easy)
       {
+         PlayerPrefs.DeleteKey("EasyTime");
+         crosswordManager.DeleteSavedPuzzle();
+
          crosswordManager.ClearGrid();
          crosswordManager.StartEasylevel();
       }
       else if (_Gamelevel == gamelevel.medium)
       {
+         PlayerPrefs.DeleteKey("MediumTime");
+         crosswordManagerM.DeleteSavedPuzzle();
+
          crosswordManagerM.ClearGrid();
          crosswordManagerM.StartMediumlevel();
       }
       else if (_Gamelevel == gamelevel.hard)
       {
+         PlayerPrefs.DeleteKey("HardTime");
+         crosswordManagerH.DeleteSavedPuzzle();
+
          crosswordManagerH.ClearGrid();
          crosswordManagerH.StartHardlevel();
       }
+
+      PlayerPrefs.Save();
+
       tryagain.SetActive(false);
+
       hintbutton1.interactable = true;
       hintbutton2.interactable = true;
       hintbutton3.interactable = true;
