@@ -308,6 +308,7 @@ public class CrosswordManager : MonoBehaviour
         GameManager.instance.timerRunning = false;
         GameManager.instance.playagainbtn.SetActive(true);
     }
+    
     }
     public void ShowHint()
     {

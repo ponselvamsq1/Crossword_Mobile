@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
    public Image s1, s2, s3;
    public Sprite emptystar,filledstar;
    private float saveTimer;
+   public GameObject completealllevel;
    
    private void Start()
    {
@@ -169,6 +170,16 @@ public class GameManager : MonoBehaviour
       levelcomplete.SetActive(true);
       timerRunning = false;
       
+      if (_Gamelevel == gamelevel.easy)
+         PlayerPrefs.SetInt("Level1Completed", 1);
+
+      else if (_Gamelevel == gamelevel.medium)
+         PlayerPrefs.SetInt("Level2Completed", 1);
+
+      else if (_Gamelevel == gamelevel.hard)
+         PlayerPrefs.SetInt("Level3Completed", 1);
+
+      PlayerPrefs.Save();
       if (_Gamelevel == gamelevel.easy && timeRemaining <= 120)
       {
          
@@ -361,10 +372,31 @@ public class GameManager : MonoBehaviour
          levelcomplete.SetActive(false);
          
       }
-      else if(_Gamelevel == gamelevel.hard)
+      else if (_Gamelevel == gamelevel.hard)
       {
-         finalpanel.SetActive(true);
-         timerRunning = false;
+         bool easyCompleted   = PlayerPrefs.GetInt("Level1Completed", 0) == 1;
+         bool mediumCompleted = PlayerPrefs.GetInt("Level2Completed", 0) == 1;
+         bool hardCompleted   = PlayerPrefs.GetInt("Level3Completed", 0) == 1;
+
+         if (easyCompleted && mediumCompleted && hardCompleted)
+         {
+            levelcomplete.SetActive(false);
+            finalpanel.SetActive(true);
+            timerRunning = false;
+         }
+         else
+         {
+            levelcomplete.SetActive(false);
+
+            // Go back to level selection instead of final panel
+            levelselection.SetActive(true);
+            startpage.SetActive(false);
+            easypanel.SetActive(false);
+            mediumpanel.SetActive(false);
+            hardpanel.SetActive(false);
+            completealllevel.SetActive(true);
+            Debug.Log("Complete Easy and Medium first.");
+         }
       }
    }
    public void OnClick_Exit()
