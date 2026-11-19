@@ -91,6 +91,7 @@ public class GameManager : MonoBehaviour
    
     void EnableTimeupPanel()
    {
+      CyberAudio.Play(CyberAudio.Cue.TimeUp);
       timeuppanel.SetActive(true);
       
    }
@@ -120,6 +121,7 @@ public class GameManager : MonoBehaviour
 
    public void RetryGame()
    {
+      CyberAudio.Unduck();
       timeuppanel.SetActive(false);
       levelcomplete.SetActive(false);
 
@@ -167,6 +169,8 @@ public class GameManager : MonoBehaviour
 
    public void EnableEasyWinpanel()
    {
+      CyberAudio.Play(CyberAudio.Cue.Win);
+      CyberAudio.Duck(2.5f);
       levelcomplete.SetActive(true);
       timerRunning = false;
       
@@ -275,6 +279,7 @@ public class GameManager : MonoBehaviour
    public void Pausegame()
    {
       Time.timeScale = 0;
+      CyberAudio.Duck();
       timerRunning = false;
       pausepanel.SetActive(true);
      
@@ -283,6 +288,7 @@ public class GameManager : MonoBehaviour
    public void Resumegame()
    {
       Time.timeScale = 1;
+      CyberAudio.Unduck();
       timerRunning = true;
       pausepanel.SetActive(false);
       
@@ -290,6 +296,7 @@ public class GameManager : MonoBehaviour
 
    public void EnableTryagain()
    {
+      CyberAudio.Play(CyberAudio.Cue.Fail);
       tryagain.SetActive(true);
       
    }
@@ -381,6 +388,8 @@ public class GameManager : MonoBehaviour
          if (easyCompleted && mediumCompleted && hardCompleted)
          {
             levelcomplete.SetActive(false);
+            CyberAudio.Play(CyberAudio.Cue.Final);
+            CyberAudio.Duck(4f);
             finalpanel.SetActive(true);
             timerRunning = false;
          }

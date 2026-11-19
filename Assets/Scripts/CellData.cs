@@ -14,12 +14,13 @@ public class CellData : MonoBehaviour
     public Vector2Int gridPosition;
     private Tween blinkTween;
     public bool isCorrect = false;
+    public bool IsSelected { get; private set; }
     public void Setup(Vector2Int pos)
     {
         gridPosition = pos;
         letterText.text = "";
         numberText.text = "";
-        letterText.color = Color.black;
+        letterText.color = CyberTheme.CellText;
         DisableCellColor();
     }
 
@@ -36,7 +37,7 @@ public class CellData : MonoBehaviour
     public void EnableCell()
     {
         GetComponent<Button>().interactable = true;
-        bgImage.color = Color.white;
+        bgImage.color = CyberTheme.CellNormal;
     }
     public void DisableCell()
     {
@@ -45,13 +46,14 @@ public class CellData : MonoBehaviour
     }
     public void DisableCellColor()
     {
-        bgImage.color = new Color(0.7f, 0.7f, 0.7f);
+        bgImage.color = CyberTheme.CellBlocked;
     }
 
     public void SelectCellColor()
     {
        StopBlink();
-       bgImage.color = new Color(1f, 0.8f, 0f);
+       IsSelected = true;
+       bgImage.color = CyberTheme.CellSelected;
 
        blinkTween = transform
            .DOScale(1.15f, 0.4f)
@@ -61,13 +63,13 @@ public class CellData : MonoBehaviour
 
     public void NormalColor()
     {
-        bgImage.color = Color.white;
+        bgImage.color = CyberTheme.CellNormal;
     }
     public void CorrectColor()
     {
         isCorrect = true;
         
-        bgImage.color = Color.green;
+        bgImage.color = CyberTheme.CellCorrect;
 
         letterText.color = Color.white;
     }
@@ -94,6 +96,7 @@ public class CellData : MonoBehaviour
             blinkTween = null;
         }
         transform.localScale = Vector3.one;
-        bgImage.color = new Color(1f, 0.92f, 0.6f);
+        IsSelected = false;
+        bgImage.color = CyberTheme.CellActiveWord;
     }
 }

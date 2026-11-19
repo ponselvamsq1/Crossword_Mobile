@@ -143,6 +143,7 @@ public class CrosswordManager : MonoBehaviour
                 GameObject cellObj = Instantiate(cellPrefab, gridParent);
 
                 CellData cell = cellObj.GetComponent<CellData>();
+                cellObj.AddComponent<CrosswordCellView>();
 
                 Vector2Int pos = new Vector2Int(x, y);
 
@@ -196,11 +197,11 @@ public class CrosswordManager : MonoBehaviour
 
            if (cell.isCorrect)
            {
-               cell.bgImage.color = Color.green; // your correct color
+               cell.bgImage.color = CyberTheme.CellCorrect;
            }
            else
            {
-               cell.bgImage.color = Color.white;
+               cell.bgImage.color = CyberTheme.CellNormal;
            }
        }
        for (int i = 0; i < wordToHighlight.word.Length; i++)
@@ -216,7 +217,7 @@ public class CrosswordManager : MonoBehaviour
            if (gridCells.ContainsKey(pos))
            {
                gridCells[pos].bgImage.color =
-                   new Color(1f, 0.92f, 0.6f);
+                   CyberTheme.CellActiveWord;
            }
        }
    }
